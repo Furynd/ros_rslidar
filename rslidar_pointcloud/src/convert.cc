@@ -71,10 +71,15 @@ void Convert::processScan(const rslidar_msgs::rslidarScan::ConstPtr& scanMsg)
   // process each packet provided by the driver
 
   data_->block_num = 0;
+  float _front_min = 100.0;
+  float _right_min = 100.0;
+  float _left_min = 100.0;
   for (size_t i = 0; i < scanMsg->packets.size(); ++i)
   {
-    data_->unpack(scanMsg->packets[i], outPoints);
+    data_->unpack(scanMsg->packets[i], outPoints, &_right_min, &_left_min, &_front_min);
+
   }
+  printf("%.4f %.4f %.4f\n",_front_min, _right_min, _left_min);
   sensor_msgs::PointCloud2 outMsg;
   pcl::toROSMsg(*outPoints, outMsg);
 

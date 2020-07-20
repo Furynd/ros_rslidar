@@ -31,6 +31,7 @@ void RawData::loadConfigFile(ros::NodeHandle node, ros::NodeHandle private_nh)
   std::string model;
   std::string sub_model;
   std::string resolution_param;
+  int angle_offset;
   private_nh.param("model", model, std::string("RS16"));
   private_nh.param("curves_path", curvesPath, std::string(""));
   private_nh.param("angle_path", anglePath, std::string(""));
@@ -73,6 +74,12 @@ void RawData::loadConfigFile(ros::NodeHandle node, ros::NodeHandle private_nh)
   info_print_flag_ = false;
   private_nh.param("resolution_type", resolution_param, std::string("0.5cm"));
   private_nh.param("intensity_mode", intensity_mode_, 1);
+  private_nh.param("angle_offset", angle_offset, 0);
+  ROS_INFO_STREAM("Angle offset: " << angle_offset);
+  private_nh.param("front_height", this->front_height, 0.0f);
+  ROS_INFO_STREAM("Front Height: " << this->front_height);
+  private_nh.param("vehicle_width", this->vehicle_width, 1.5f);
+  ROS_INFO_STREAM("Vehicle Width: " << this->vehicle_width);
 
   if (resolution_param == "0.5cm")
   {
@@ -135,7 +142,7 @@ void RawData::loadConfigFile(ros::NodeHandle node, ros::NodeHandle private_nh)
   this->sin_lookup_table_.resize(36000);
   for (unsigned int i = 0; i < 36000; i++)
   {
-    double rad = RS_TO_RADS(i / 100.0f);
+    double rad = RS_TO_RADS(((i+angle_offset)%36000) / 100.0f);
 
     this->cos_lookup_table_[i] = std::cos(rad);
     this->sin_lookup_table_[i] = std::sin(rad);
@@ -828,7 +835,7 @@ int RawData::estimateTemperature(float Temper)
  *  @param pkt raw packet to unpack
  *  @param pc shared pointer to point cloud (points are appended)
  */
-void RawData::unpack(const rslidar_msgs::rslidarPacket& pkt, pcl::PointCloud<pcl::PointXYZI>::Ptr pointcloud)
+void RawData::unpack(const rslidar_msgs::rslidarPacket& pkt, pcl::PointCloud<pcl::PointXYZI>::Ptr pointcloud, float* right_min, float* left_min, float* front_min)
 {
   // check pkt header
   if (pkt.data[0] != 0x55 || pkt.data[1] != 0xAA || pkt.data[2] != 0x05 || pkt.data[3] != 0x0A)
@@ -846,6 +853,8 @@ void RawData::unpack(const rslidar_msgs::rslidarPacket& pkt, pcl::PointCloud<pcl
   float azimuth_diff;
   float azimuth_corrected_f;
   int azimuth_corrected;
+
+  float front_width = this->vehicle_width/2;
 
   const raw_packet_t* raw = (const raw_packet_t*)&pkt.data[42];
 
@@ -912,7 +921,7 @@ void RawData::unpack(const rslidar_msgs::rslidarPacket& pkt, pcl::PointCloud<pcl
         union two_bytes tmp;
         tmp.bytes[1] = raw->blocks[block].data[k];
         tmp.bytes[0] = raw->blocks[block].data[k + 1];
-        int distance = tmp.uint;
+        ushort distance = tmp.uint;
 
         // read intensity
         intensity = raw->blocks[block].data[k + 2];
@@ -922,14 +931,8 @@ void RawData::unpack(const rslidar_msgs::rslidarPacket& pkt, pcl::PointCloud<pcl
           intensity = calibrateIntensity_old(intensity, dsr, distance);
 
         float distance2 = pixelToDistance(distance, dsr);
-        if (dis_resolution_mode_ == 0)  // distance resolution is 0.5cm
-        {
-          distance2 = distance2 * DISTANCE_RESOLUTION_NEW;
-        }
-        else
-        {
-          distance2 = distance2 * DISTANCE_RESOLUTION;
-        }
+        
+        distance2 = distance2 * DISTANCE_RESOLUTION_NEW;
 
         int arg_horiz = (azimuth_corrected + 36000) % 36000;
         int arg_horiz_orginal = arg_horiz;
@@ -956,12 +959,27 @@ void RawData::unpack(const rslidar_msgs::rslidarPacket& pkt, pcl::PointCloud<pcl
           point.y = -distance2 * this->cos_lookup_table_[arg_vert] * this->sin_lookup_table_[arg_horiz] -
                     Rx_ * this->sin_lookup_table_[arg_horiz_orginal];
           point.z = distance2 * this->sin_lookup_table_[arg_vert] + Rz_;
-          point.intensity = intensity;
+          // if(arg_horiz < 18000)
+          point.intensity = intensity;//255/(dsr+1);
+          // else 
+          // point.intensity = 0;//255/(dsr+1);
+          if(point.x > 0.0 && point.z > front_height)
+          if(point.y > -front_width && point.y < front_width)
+            *front_min = std::min(*front_min, distance2);
+
+          if(arg_horiz > 30000 && arg_horiz < 35000 && point.x > 0.0)
+            *left_min = std::min(*left_min, distance2);
+
+          if(arg_horiz > 1000 && arg_horiz < 6000 && point.x > 0.0)
+            *right_min = std::min(*right_min, distance2);
+
           pointcloud->at(2 * this->block_num + firing, dsr) = point;
         }
       }
     }
   }
+  // if(front_min < 100) printf("%f\n",front_min);
+  // return front_min;
 }
 
 void RawData::unpack_RS32(const rslidar_msgs::rslidarPacket& pkt, pcl::PointCloud<pcl::PointXYZI>::Ptr pointcloud)

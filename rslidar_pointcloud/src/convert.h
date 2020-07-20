@@ -34,12 +34,14 @@ private:
 
   void processScan(const rslidar_msgs::rslidarScan::ConstPtr& scanMsg);
 
+
   /// Pointer to dynamic reconfigure service srv_
   boost::shared_ptr<dynamic_reconfigure::Server<rslidar_pointcloud::CloudNodeConfig> > srv_;
 
   boost::shared_ptr<rslidar_rawdata::RawData> data_;
   ros::Subscriber rslidar_scan_;
   ros::Publisher output_;
+  ros::Publisher ranges_;
 };
 
 }  // namespace rslidar_pointcloud
