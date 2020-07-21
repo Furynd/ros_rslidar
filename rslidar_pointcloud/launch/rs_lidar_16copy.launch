@@ -24,10 +24,16 @@
     <param name="min_distance" value="0.4"/>
     <param name="resolution_type" value="1cm"/>
     <param name="intensity_mode" value="1"/>
+    <param name="angle_offset" value="720"/>
+    <param name="front_angle" value="30"/>
+    <param name="front_range" value="5"/>
+    <param name="front_height" value="0.2"/>
+    <param name="vehicle_width" value="1.5"/>
+    <param name="side_angle" value="60"/>
+    <param name="side_range" value="3"/>
   </node>
 
   <!-- <node name="view" pkg="image_view" type="image_view" image="lidarROI"></node> -->
-  <node name="field_scanner" pkg="field_scanner" type="field_scanner_node" output="screen"></node>
   <node name="rviz" pkg="rviz" type="rviz"  args="-d $(find rslidar_pointcloud)/rviz_cfg/rslidaredit.rviz" />
 
 </launch>

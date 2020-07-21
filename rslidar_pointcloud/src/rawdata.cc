@@ -80,6 +80,8 @@ void RawData::loadConfigFile(ros::NodeHandle node, ros::NodeHandle private_nh)
   ROS_INFO_STREAM("Front Height: " << this->front_height);
   private_nh.param("vehicle_width", this->vehicle_width, 1.5f);
   ROS_INFO_STREAM("Vehicle Width: " << this->vehicle_width);
+  private_nh.param("side_angle", this->side_angle, 60);
+  ROS_INFO_STREAM("side angle: " << this->side_angle);
 
   if (resolution_param == "0.5cm")
   {
@@ -835,7 +837,7 @@ int RawData::estimateTemperature(float Temper)
  *  @param pkt raw packet to unpack
  *  @param pc shared pointer to point cloud (points are appended)
  */
-void RawData::unpack(const rslidar_msgs::rslidarPacket& pkt, pcl::PointCloud<pcl::PointXYZI>::Ptr pointcloud, float* right_min, float* left_min, float* front_min)
+void RawData::unpack(const rslidar_msgs::rslidarPacket& pkt, pcl::PointCloud<pcl::PointXYZI>::Ptr pointcloud, float* right_min, float* left_min, float* front_min, float positions[9])
 {
   // check pkt header
   if (pkt.data[0] != 0x55 || pkt.data[1] != 0xAA || pkt.data[2] != 0x05 || pkt.data[3] != 0x0A)
@@ -855,6 +857,8 @@ void RawData::unpack(const rslidar_msgs::rslidarPacket& pkt, pcl::PointCloud<pcl
   int azimuth_corrected;
 
   float front_width = this->vehicle_width/2;
+  int side_angle_left = 36000 - this->side_angle*100;
+  int side_angle_right = this->side_angle*100;
 
   const raw_packet_t* raw = (const raw_packet_t*)&pkt.data[42];
 
@@ -964,14 +968,33 @@ void RawData::unpack(const rslidar_msgs::rslidarPacket& pkt, pcl::PointCloud<pcl
           // else 
           // point.intensity = 0;//255/(dsr+1);
           if(point.x > 0.0 && point.z > front_height)
-          if(point.y > -front_width && point.y < front_width)
+          if(point.y > -front_width && point.y < front_width){
             *front_min = std::min(*front_min, distance2);
+            if(*front_min == distance2){
+              positions[0] = point.x;
+              positions[1] = point.y;
+              positions[2] = point.z;
+            }
+          }
 
-          if(arg_horiz > 30000 && arg_horiz < 35000 && point.x > 0.0)
+          if(arg_horiz > side_angle_left && arg_horiz < 35000 && point.z > 0.0){
             *left_min = std::min(*left_min, distance2);
+            if(*left_min == distance2){
+              positions[3] = point.x;
+              positions[4] = point.y;
+              positions[5] = point.z;
+            }
+          }
 
-          if(arg_horiz > 1000 && arg_horiz < 6000 && point.x > 0.0)
+          if(arg_horiz > 1000 && arg_horiz < side_angle_right && point.z > 0.0){
             *right_min = std::min(*right_min, distance2);
+            if(*right_min == distance2){
+              positions[6] = point.x;
+              positions[7] = point.y;
+              positions[8] = point.z;
+            }
+          }
+            
 
           pointcloud->at(2 * this->block_num + firing, dsr) = point;
         }

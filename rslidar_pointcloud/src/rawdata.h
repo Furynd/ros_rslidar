@@ -129,7 +129,7 @@ public:
   void loadConfigFile(ros::NodeHandle node, ros::NodeHandle private_nh);
 
   /*unpack the RS16 UDP packet and opuput PCL PointXYZI type*/
-  void unpack(const rslidar_msgs::rslidarPacket& pkt, pcl::PointCloud<pcl::PointXYZI>::Ptr pointcloud, float* right_min, float* left_min, float* front_min);
+  void unpack(const rslidar_msgs::rslidarPacket& pkt, pcl::PointCloud<pcl::PointXYZI>::Ptr pointcloud, float* right_min, float* left_min, float* front_min, float positions[9]);
 
   /*unpack the RS32 UDP packet and opuput PCL PointXYZI type*/
   void unpack_RS32(const rslidar_msgs::rslidarPacket& pkt, pcl::PointCloud<pcl::PointXYZI>::Ptr pointcloud);
@@ -177,7 +177,7 @@ private:
   bool isBpearlLidar_;
   bool angle_flag_;
 
-  int front_angle,side_angle;
+  int front_angle, side_angle;
   float front_height;
   float front_range, side_range, vehicle_width;
 

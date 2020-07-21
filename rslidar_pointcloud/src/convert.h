@@ -17,6 +17,9 @@
 #include <dynamic_reconfigure/server.h>
 #include <rslidar_pointcloud/CloudNodeConfig.h>
 #include "rawdata.h"
+#include <rslidar_msgs/lidarRawData.h>
+#include <visualization_msgs/Marker.h>
+#include <geometry_msgs/Point32.h>
 
 namespace rslidar_pointcloud
 {
@@ -34,6 +37,7 @@ private:
 
   void processScan(const rslidar_msgs::rslidarScan::ConstPtr& scanMsg);
 
+  int publishMarker(ros::Publisher pubs, float x, float y, float z, int c);
 
   /// Pointer to dynamic reconfigure service srv_
   boost::shared_ptr<dynamic_reconfigure::Server<rslidar_pointcloud::CloudNodeConfig> > srv_;
@@ -42,6 +46,8 @@ private:
   ros::Subscriber rslidar_scan_;
   ros::Publisher output_;
   ros::Publisher ranges_;
+  ros::Publisher pos_pub[3];
+  // ros::Publisher 
 };
 
 }  // namespace rslidar_pointcloud
