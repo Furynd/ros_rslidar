@@ -1,5 +1,9 @@
 ## Lidar output data
-Header Header
-float32 front_dist
-float32 left_dist
-float32 right_dist
+Header header       ##header
+float32 front_dist  ##front minimal distance
+float32 left_dist   ##left minimal distance
+float32 right_dist  ##right minimal distance
+
+geometry_msgs/Point32 frontPos
+geometry_msgs/Point32 leftPos
+geometry_msgs/Point32 rightPos
