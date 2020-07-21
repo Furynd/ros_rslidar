@@ -8,7 +8,7 @@ add_message_files(
   FILES
   rslidarPacket.msg
   rslidarScan.msg
-  lidarRawData.msg
+  ThreePointData.msg
   objectDetection.msg
 )
 generate_messages(DEPENDENCIES std_msgs geometry_msgs)

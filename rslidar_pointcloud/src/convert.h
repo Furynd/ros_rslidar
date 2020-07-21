@@ -17,9 +17,10 @@
 #include <dynamic_reconfigure/server.h>
 #include <rslidar_pointcloud/CloudNodeConfig.h>
 #include "rawdata.h"
-#include <rslidar_msgs/lidarRawData.h>
+#include <rslidar_msgs/ThreePointData.h>
 #include <visualization_msgs/Marker.h>
 #include <geometry_msgs/Point32.h>
+#include <geometry_msgs/Point.h>
 
 namespace rslidar_pointcloud
 {
@@ -46,6 +47,7 @@ private:
   ros::Subscriber rslidar_scan_;
   ros::Publisher output_;
   ros::Publisher ranges_;
+  ros::Publisher nearestPub;
   ros::Publisher pos_pub[3];
   // ros::Publisher 
 };

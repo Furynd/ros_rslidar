@@ -10,6 +10,9 @@ Panels:
         - /PointCloud21
         - /PointCloud21/Autocompute Value Bounds1
         - /Axes1
+        - /Marker1
+        - /Marker2
+        - /Marker3
       Splitter Ratio: 0.5
     Tree Height: 761
   - Class: rviz/Selection
@@ -71,9 +74,9 @@ Visualization Manager:
       Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
-      Max Intensity: 190.68240356445312
+      Max Intensity: 255
       Min Color: 0; 0; 0
-      Min Intensity: 0.5147058963775635
+      Min Intensity: 0.6231060028076172
       Name: PointCloud2
       Position Transformer: XYZ
       Queue Size: 255
@@ -81,7 +84,7 @@ Visualization Manager:
       Size (Pixels): 2
       Size (m): 0.009999999776482582
       Style: Points
-      Topic: /rslidar_points
+      Topic: /lidar/point_cloud
       Unreliable: true
       Use Fixed Frame: true
       Use rainbow: true
@@ -119,7 +122,7 @@ Visualization Manager:
       Value: false
     - Class: rviz/Marker
       Enabled: true
-      Marker Topic: /pos0
+      Marker Topic: /lidar/marker0
       Name: Marker
       Namespaces:
         /rslidar: true
@@ -127,7 +130,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Marker
       Enabled: true
-      Marker Topic: /pos1
+      Marker Topic: /lidar/marker1
       Name: Marker
       Namespaces:
         /rslidar: true
@@ -135,7 +138,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Marker
       Enabled: true
-      Marker Topic: /pos2
+      Marker Topic: /lidar/marker2
       Name: Marker
       Namespaces:
         /rslidar: true
@@ -169,25 +172,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 49.69282913208008
+      Distance: 62.59638214111328
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 4.064985752105713
-        Y: -10.820555686950684
-        Z: -2.452509943395853e-5
+        X: -2.5246617794036865
+        Y: 9.033329010009766
+        Z: -1.1531788913998753e-5
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.7748011350631714
+      Pitch: 0.6348015069961548
       Target Frame: aft_mapped
       Value: ThirdPersonFollower (rviz)
-      Yaw: 3.553554058074951
+      Yaw: 3.553550958633423
     Saved: ~
 Window Geometry:
   Displays:
