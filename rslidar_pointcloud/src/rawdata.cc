@@ -958,17 +958,17 @@ void RawData::unpack(const rslidar_msgs::rslidarPacket& pkt, pcl::PointCloud<pcl
         {
           // If you want to fix the rslidar X aixs to the front side of the cable, please use the two line below
 
-          point.x = distance2 * this->cos_lookup_table_[arg_vert] * this->cos_lookup_table_[arg_horiz] +
+          point.y = distance2 * this->cos_lookup_table_[arg_vert] * this->cos_lookup_table_[arg_horiz] +
                     Rx_ * this->cos_lookup_table_[arg_horiz_orginal];
-          point.y = -distance2 * this->cos_lookup_table_[arg_vert] * this->sin_lookup_table_[arg_horiz] -
+          point.x = distance2 * this->cos_lookup_table_[arg_vert] * this->sin_lookup_table_[arg_horiz] -
                     Rx_ * this->sin_lookup_table_[arg_horiz_orginal];
           point.z = distance2 * this->sin_lookup_table_[arg_vert] + Rz_;
           // if(arg_horiz < 18000)
           point.intensity = intensity;//255/(dsr+1);
           // else 
           // point.intensity = 0;//255/(dsr+1);
-          if(point.x > 0.0 && point.z > front_height)
-          if(point.y > -front_width && point.y < front_width){
+          if(point.y > 0.0 && point.z > front_height)
+          if(point.x > -front_width && point.x < front_width){
             *front_min = std::min(*front_min, distance2);
             if(*front_min == distance2){
               positions[0] = point.x;

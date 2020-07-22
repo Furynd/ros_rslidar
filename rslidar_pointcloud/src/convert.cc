@@ -110,13 +110,13 @@ void Convert::processScan(const rslidar_msgs::rslidarScan::ConstPtr& scanMsg)
   out.rightPos.z = positions[8];
 
   ranges_.publish(out);
-  if(_front_min < 100){
-    geometry_msgs::Point object;
-    object.x = out.frontPos.x;
-    object.y = out.frontPos.y;
-    object.z = out.frontPos.z;
-    nearestPub.publish(object);
-  }
+  // if(_front_min < 100){
+  geometry_msgs::Point object;
+  object.x = out.frontPos.x;
+  object.y = out.frontPos.y;
+  object.z = out.frontPos.z;
+  nearestPub.publish(object);
+  // }
 
   publishMarker(pos_pub[0], positions[0],positions[1],positions[2],0);
   publishMarker(pos_pub[1], positions[3],positions[4],positions[5],1);
@@ -153,9 +153,9 @@ int Convert::publishMarker(ros::Publisher pubs, float x, float y, float z, int c
     marker.pose.orientation.w = 1.0;
 
     // Set the scale of the marker -- 1x1x1 here means 1m on a side
-    marker.scale.x = 0.1;
-    marker.scale.y = 0.1;
-    marker.scale.z = 0.1;
+    marker.scale.x = 0.5;
+    marker.scale.y = 0.5;
+    marker.scale.z = 0.5;
 
     // Set the color -- be sure to set alpha to something non-zero!
     switch (c)
